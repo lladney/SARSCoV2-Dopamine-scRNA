@@ -74,9 +74,8 @@ This will:
 - Perform initial UMAP and PCA visualization
 
 Outputs:
-1) ![UMAP Clusters](results/figures/umap_clusters.pdf)
-2) 📄 [View PCA Elbow Plot (PDF)](results/figures/pca_elbow_plot.pdf)
-
+1) ![UMAP Clusters](results/figures/umap_clusters.png)
+2) ![PCA Elbow Plot](results/figures/pca_elbow_plot.png)
 
 ### Step 2:  *NORMALIZATION AND CLUSTERING*
 Go to the scripts/ directory and run:
@@ -89,7 +88,7 @@ This will:
 - Perform PCA, clustering, and UMAP dimensionality reduction
 
 Outputs:
-1) Updates ![UMAP Clusters](results/figures/umap_clusters.pdf)
+1) Updates ![UMAP Clusters](results/figures/umap_clusters.png)
 
 ### Step 3:  *DIFFERENTIAL EXPRESSION ANALYSIS*
 Go to the scripts/ directory and run:
@@ -101,7 +100,7 @@ This will:
 
 Outputs:
 1) ` degs_infected_vs_mock.csv `
-2) ![Volcano Plot](results/figures/volcano_degs.pdf)
+2) ![Volcano Plot](results/figures/volcano_degs.png)
 
 ### Step 4:  *GO AND KEGG ENRICHMENT ANALYSIS*
 Go to the scripts/ directory and run:
