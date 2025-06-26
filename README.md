@@ -37,66 +37,82 @@ sarscov2-dopamine-scRNA/
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/plasmodium-rnaseq-pipeline.git
-cd plasmodium-rnaseq-pipeline
+git clone https://github.com/lladney/SARSCoV2-Dopamine-scRNA.git
+cd SARSCoV2-Dopamine-scRNA
 ```  
 
 2. Create a Conda environment:
 ```bash
-conda create -n plasmodium_env python=3.10
-conda activate plasmodium_env
+conda env create -f environment.yml
+conda activate seurat_env
 ```
-
-3. Install Python dependencies:
-```
-pip install -r requirements.txt
-```
-
-4. Install the required command-line tools via [bioconda](https://bioconda.github.io/):
-   - `fastqc`: Quality control for raw reads
-   - `cutadapt`: Adapter trimming
-   - `salmon`: Transcript-level quantification
-   - `multiqc`: Aggregated QC reporting
-
-   You can install them all at once:
-   ```bash
-   conda install -c bioconda fastqc cutadapt salmon multiqc
 
 ## Running the Pipeline
 
-### Step 1:  *PREPROCESSING*
-Go to the preprocessing/ directory and run: 
-```python 
-Preprocessing_Pipeline_1.py
-```
-This will perform: 
-- GEO/SRA Metadata Fetching
-- FASTQ Download
-- Adapter Trimming with Cutadapt
-- Quality Control with FastQC
-- MultiQC Summary
-
-### Step 2:  *QUANTIFICATION*
-Go to the quantification/ directory and run:
-```python
-Alignment_Quantification_2.py
+### Step 1:  *IMPORT AND QUALITY CONTROL*
+Go to the scripts/ directory and run: 
+```R 
+Rscript 01_import_qc.R
 ```
 This will: 
-- Build a Salmon Index
-- Quantify transcript expression
-- Generate gene-level count matrix and metadata CSV
+- Import the expression matrix
+- Filter low-quality cells and genes
+- Perform initial UMAP and PCA visualization
+
+### Step 2:  *NORMALIZATION AND CLUSTERING*
+Go to the scripts/ directory and run:
+```R
+Rscript 02_normalization_clustering.R
+```
+This will: 
+- Normalize and scale the data
+- Identify variable features
+- Perform PCA, clustering, and UMAP dimensionality reduction
 
 ### Step 3:  *DIFFERENTIAL EXPRESSION ANALYSIS*
-Go to the dgeanalysis/ directory and run:
-```Rscript
-DGE_Analysis_DESeq2.R
+Go to the scripts/ directory and run:
+```R
+Rscript 03_differential_expression.R
 ```	
-This will produce: 
-- deseq2_results.csv: Differential expression output
-- volcano_plot.png: Volcano plot of DEGs
-- heatmap_top20_DEGs.png: Heatmap of top 20 DEGs
-- PCA_plot.png: Principal component analysis of samples
+This will: 
+- Compare infected vs. mock-treated cells
+- Output degs_infected_vs_mock.csv and volcano plots
+
+### Step 4:  *GO AND KEGG ENRICHMENT ANALYSIS*
+Go to the scripts/ directory and run:
+```R
+Rscript 04_enrichment_analysis.R
+```	
+This will: 
+- Use clusterProfiler to identify enriched GO terms and KEGG pathways
+- Output enrichment result tables
+
+### Step 5:  *PLOT ENRICHMENT RESULTS*
+Go to the scripts/ directory and run:
+```R
+Rscript 05_enrichment_dotplots.R
+```	
+This will: 
+- Generate dotplots for enriched pathways
+
+### Step 6:  *GO ENRICHMENT BY DIRECTION*
+Go to the scripts/ directory and run:
+```R
+Rscript 06_go_enrichment_by_direction.R
+```	
+This will: 
+- Separate enrichment results for upregulated vs. downregulated genes
+
+### Step 7:  *VISUALIZE GO TERMS*
+Go to the scripts/ directory and run:
+```R
+Rscript 07_plot_go_dotplots.R
+```	
+This will: 
+- Generate directional dotplots for biological process GO terms
 
 ## Notes
-* Raw data files and large intermediate results are .gitignored
+* Raw FASTQ files and intermediate large data are .gitignored
 * This pipeline was developed and tested on macOS 10.15 with Conda and R 4.3+
+* Expression matrix was derived from GSE248989
+* 
