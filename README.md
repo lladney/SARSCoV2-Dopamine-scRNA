@@ -27,11 +27,8 @@ sarscov2-dopamine-scRNA/
 ├── results/                            # All output files from analysis
 │   ├── figures/                        # PDF/PNG plots: UMAPs, PCA, volcano, GO/KEGG dotplots
 │   └── tables/                         # CSV tables with DEGs and GO/KEGG enrichment results
-│
 ├── environment.yml                     # Defines Conda environment with R, Seurat, and dependencies
-│
 ├── .gitignore                          # Excludes unnecessary or large files from Git tracking
-│
 └── README.md                           # Project overview, instructions, and structure description
 
 ```
