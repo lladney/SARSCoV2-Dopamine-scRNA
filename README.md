@@ -25,8 +25,22 @@ sarscov2-dopamine-scRNA/
 │   └── sample_metadata.csv             # CSV file linking each sample to its condition (infected/mock)
 │
 ├── results/                            # All output files from analysis
-│   ├── figures/                        # PDF/PNG plots: UMAPs, PCA, volcano, GO/KEGG dotplots
-│   └── tables/                         # CSV tables with DEGs and GO/KEGG enrichment results
+│   ├── figures/                        # Visual outputs
+│   │   ├── umap_clusters.png               # UMAP of cell clusters
+│   │   ├── pca_elbow_plot.pdf              # PCA elbow plot for dimensionality reduction
+│   │   ├── volcano_degs.png                # Volcano plot of differentially expressed genes
+│   │   ├── dotplot_go_bp.png               # Dotplot: GO Biological Processes
+│   │   ├── dotplot_go_upregulated.png      # Dotplot: GO terms for upregulated DEGs
+│   │   ├── dotplot_go_downregulated.png    # Dotplot: GO terms for downregulated DEGs
+│   │   └── dotplot_kegg.png                # Dotplot: KEGG pathways
+│   │
+│   └── tables/                         # Tabular outputs
+│       ├── degs_infected_vs_mock.csv       # Differential expression results
+│       ├── go_enrichment.csv               # All GO term enrichment results
+│       ├── go_up.csv                       # GO terms enriched in upregulated genes
+│       ├── go_down.csv                     # GO terms enriched in downregulated genes
+│       ├── kegg_enrichment.csv             # KEGG pathway enrichment results
+│       └── unmapped_genes.csv              # Genes excluded from enrichment due to annotation issues
 │
 ├── environment.yml                     # Defines Conda environment with R, Seurat, and dependencies
 ├── .gitignore                          # Excludes unnecessary or large files from Git tracking
