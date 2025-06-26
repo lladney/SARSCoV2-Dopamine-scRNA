@@ -73,6 +73,11 @@ This will:
 - Filter low-quality cells and genes
 - Perform initial UMAP and PCA visualization
 
+Outputs:
+1) ![UMAP Clusters](results/figures/umap_clusters.pdf)
+2) ![PCA Elbow Plot](results/figures/pca_elbow_plot.pdf)
+
+
 ### Step 2:  *NORMALIZATION AND CLUSTERING*
 Go to the scripts/ directory and run:
 ```bash
@@ -83,6 +88,9 @@ This will:
 - Identify variable features
 - Perform PCA, clustering, and UMAP dimensionality reduction
 
+Outputs:
+1) Updates ![UMAP Clusters](results/figures/umap_clusters.pdf)
+
 ### Step 3:  *DIFFERENTIAL EXPRESSION ANALYSIS*
 Go to the scripts/ directory and run:
 ```bash
@@ -90,7 +98,10 @@ Rscript 03_differential_expression.R
 ```	
 This will: 
 - Compare infected vs. mock-treated cells
-- Output ```degs_infected_vs_mock.csv``` and volcano plots
+
+Outputs:
+1) ` degs_infected_vs_mock.csv `
+2) ![Volcano Plot](results/figures/volcano_degs.pdf)
 
 ### Step 4:  *GO AND KEGG ENRICHMENT ANALYSIS*
 Go to the scripts/ directory and run:
@@ -99,7 +110,10 @@ Rscript 04_enrichment_analysis.R
 ```	
 This will: 
 - Use clusterProfiler to identify enriched GO terms and KEGG pathways
-- Output enrichment result tables
+
+Outputs:
+1) ` results/tables/go_enrichment.csv `
+2) ` results/tables/kegg_enrichment.csv `
 
 ### Step 5:  *PLOT ENRICHMENT RESULTS*
 Go to the scripts/ directory and run:
@@ -109,6 +123,10 @@ Rscript 05_enrichment_dotplots.R
 This will: 
 - Generate dotplots for enriched pathways
 
+Outputs:
+1) ![Dotplot GO BP](results/figures/dotplot_go_bp.png)
+2) ![Dotplot KEGG](results/figures/dotplot_kegg.png)
+
 ### Step 6:  *GO ENRICHMENT BY DIRECTION*
 Go to the scripts/ directory and run:
 ```bash
@@ -117,6 +135,10 @@ Rscript 06_go_enrichment_by_direction.R
 This will: 
 - Separate enrichment results for upregulated vs. downregulated genes
 
+Outputs:
+1) ` results/tables/go_up.csv `
+2) ` results/tables/go_down.csv `
+
 ### Step 7:  *VISUALIZE GO TERMS*
 Go to the scripts/ directory and run:
 ```bash
@@ -124,6 +146,10 @@ Rscript 07_plot_go_dotplots.R
 ```	
 This will: 
 - Generate directional dotplots for biological process GO terms
+
+Outputs:
+1) ![Dotplot GO Upregulated](results/figures/dotplot_go_upregulated.png)
+2) ![Dotplot GO Downregulated](results/figures/dotplot_go_downregulated.png)
 
 ## Dataset
 
