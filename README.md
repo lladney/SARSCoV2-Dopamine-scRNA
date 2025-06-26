@@ -127,21 +127,6 @@ This project uses single-cell RNA-seq data from [GSE248989](https://www.ncbi.nlm
 
 Yang, L., Kim, T. W., Han, Y., Nair, M. S., Harschnitz, O., Zhu, J., et al. (2024). *SARS-CoV-2 infection causes dopaminergic neuron senescence*. *Cell Stem Cell, 31*(2), 196–211.e6. https://doi.org/10.1016/j.stem.2023.12.012
 
-**BibTeX:**
-```bibtex
-@article{Yang2024DopamineSenescence,
-  author  = {Yang, Liuliu and Kim, Tae Wan and Han, Yuling and Nair, Manoj S and Harschnitz, Oliver and Zhu, Jiajun and … Chen, Shuibing},
-  title   = {SARS-CoV‑2 infection causes dopaminergic neuron senescence},
-  journal = {Cell Stem Cell},
-  year    = {2024},
-  volume  = {31},
-  number  = {2},
-  pages   = {196–211.e6},
-  doi     = {10.1016/j.stem.2023.12.012},
-  pmid    = {38237586}
-}
-```
-
 ## Notes
 * Raw FASTQ files and intermediate large data are excluded via ```.gitignore```
 * This pipeline was developed and tested on macOS 10.15 with Conda and R 4.3+
