@@ -111,7 +111,41 @@ Rscript 07_plot_go_dotplots.R
 This will: 
 - Generate directional dotplots for biological process GO terms
 
+## Dataset
+
+This project uses single-cell RNA-seq data from [GSE248989](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE248989), profiling pluripotent human stem cell–derived dopaminergic neurons infected with SARS-CoV-2.
+
+- **Title:** SARS-CoV-2 Infection Causes Dopaminergic Neuron Senescence
+- **GEO Accession:** GSE248989  
+- **Organism:** Homo sapiens  
+- **Conditions:** SARS-CoV-2–infected vs. mock-treated neurons  
+- **Rationale:** Selected for its relevance to neurological dysfunction and COVID-19, the dataset contains high-quality 10X scRNA-seq suitable for infection-induced transcriptomic changes through clustering, differential expression, and functional enrichment analyses.
+
+### Citation
+
+**PubMed (APA format):**
+
+Yang, L., Kim, T. W., Han, Y., Nair, M. S., Harschnitz, O., Zhu, J., et al. (2024). *SARS-CoV-2 infection causes dopaminergic neuron senescence*. *Cell Stem Cell, 31*(2), 196–211.e6. https://doi.org/10.1016/j.stem.2023.12.012
+
+**BibTeX:**
+```bibtex
+@article{Yang2024DopamineSenescence,
+  author  = {Yang, Liuliu and Kim, Tae Wan and Han, Yuling and Nair, Manoj S and Harschnitz, Oliver and Zhu, Jiajun and … Chen, Shuibing},
+  title   = {SARS-CoV‑2 infection causes dopaminergic neuron senescence},
+  journal = {Cell Stem Cell},
+  year    = {2024},
+  volume  = {31},
+  number  = {2},
+  pages   = {196–211.e6},
+  doi     = {10.1016/j.stem.2023.12.012},
+  pmid    = {38237586}
+}
+
+
 ## Notes
 * Raw FASTQ files and intermediate large data are excluded via ```.gitignore```
 * This pipeline was developed and tested on macOS 10.15 with Conda and R 4.3+
-* Expression matrix was derived from GSE248989
+* Analysis is fully reproducible using the provided scripts and ```environment.yml```
+* Processed expression and metadata files derived from GSE248989 GEO submission 
+
+
