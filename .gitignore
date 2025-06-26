@@ -1,0 +1,26 @@
+# Raw and intermediate data
+data/raw/
+data/processed/
+
+# Serialized objects and RDS outputs
+results/tables/*.rds
+
+# Archives and downloads
+*.zip
+*.tar
+
+# Temporary or side-effect plots (optional)
+Rplots.pdf
+
+# R session files
+.Rhistory
+.RData
+.Rapp.history
+
+# macOS clutter
+.DS_Store
+
+# IDE files
+*.Rproj
+.Rproj.user/
+
