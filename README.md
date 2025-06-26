@@ -51,7 +51,7 @@ conda activate seurat_env
 
 ### Step 1:  *IMPORT AND QUALITY CONTROL*
 Go to the scripts/ directory and run: 
-```R 
+```r 
 Rscript 01_import_qc.R
 ```
 This will: 
@@ -61,7 +61,7 @@ This will:
 
 ### Step 2:  *NORMALIZATION AND CLUSTERING*
 Go to the scripts/ directory and run:
-```R
+```r
 Rscript 02_normalization_clustering.R
 ```
 This will: 
@@ -71,7 +71,7 @@ This will:
 
 ### Step 3:  *DIFFERENTIAL EXPRESSION ANALYSIS*
 Go to the scripts/ directory and run:
-```R
+```r
 Rscript 03_differential_expression.R
 ```	
 This will: 
@@ -80,7 +80,7 @@ This will:
 
 ### Step 4:  *GO AND KEGG ENRICHMENT ANALYSIS*
 Go to the scripts/ directory and run:
-```R
+```r
 Rscript 04_enrichment_analysis.R
 ```	
 This will: 
@@ -89,7 +89,7 @@ This will:
 
 ### Step 5:  *PLOT ENRICHMENT RESULTS*
 Go to the scripts/ directory and run:
-```R
+```r
 Rscript 05_enrichment_dotplots.R
 ```	
 This will: 
@@ -97,7 +97,7 @@ This will:
 
 ### Step 6:  *GO ENRICHMENT BY DIRECTION*
 Go to the scripts/ directory and run:
-```R
+```r
 Rscript 06_go_enrichment_by_direction.R
 ```	
 This will: 
