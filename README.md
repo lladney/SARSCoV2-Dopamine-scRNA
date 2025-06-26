@@ -76,7 +76,7 @@ Rscript 03_differential_expression.R
 ```	
 This will: 
 - Compare infected vs. mock-treated cells
-- Output degs_infected_vs_mock.csv and volcano plots
+- Output ```degs_infected_vs_mock.csv``` and volcano plots
 
 ### Step 4:  *GO AND KEGG ENRICHMENT ANALYSIS*
 Go to the scripts/ directory and run:
@@ -112,7 +112,6 @@ This will:
 - Generate directional dotplots for biological process GO terms
 
 ## Notes
-* Raw FASTQ files and intermediate large data are .gitignored
+* Raw FASTQ files and intermediate large data are excluded via ```.gitignore```
 * This pipeline was developed and tested on macOS 10.15 with Conda and R 4.3+
 * Expression matrix was derived from GSE248989
-* 
