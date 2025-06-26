@@ -75,7 +75,7 @@ This will:
 
 Outputs:
 1) ![UMAP Clusters](results/figures/umap_clusters.pdf)
-2) ![PCA Elbow Plot](results/figures/pca_elbow_plot.pdf)
+2) 📄 [View PCA Elbow Plot (PDF)](results/figures/pca_elbow_plot.pdf)
 
 
 ### Step 2:  *NORMALIZATION AND CLUSTERING*
