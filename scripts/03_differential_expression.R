@@ -24,20 +24,25 @@ if (is.null(seurat$condition)) {                           # Check if condition 
 Idents(seurat) <- seurat$condition                         # Treat each cell's condition (infected or mock) as main grouping
 seurat <- JoinLayers(seurat)                               # Ensure Seurat object runs on full dataset (2 merged 10x datasets, infected and mock)
 
-# Run differential expression
-de_markers <- FindMarkers(seurat, ident.1 = "SARS-CoV-2", ident.2 = "Mock", 
-                          logfc.threshold = 0.25, min.pct = 0.1)
+# RUN DIFFERENTIAL EXPRESSION TO IDENTIFY UP- VS DOWN-REGULATED GENES  
+de_markers <- FindMarkers(seurat,                          # Compare two cell groups, which are...
+                          ident.1 = "SARS-CoV-2",          # 1) The test group (infected cells)
+                          ident.2 = "Mock",                # 2) The reference group (mock cells)
+                          logfc.threshold = 0.25,          # Filter for genes with ~20% fold change in either direction
+                          min.pct = 0.1)                   # Filter for genes expressed in >10% of cells in either group
 
-# Add gene column and sort
-de_markers <- de_markers %>% 
-  rownames_to_column("gene") %>%
-  arrange(p_val_adj)
+# ADD GENE COLUMN AND SORT DE RESULTS
+de_markers <- de_markers %>%                               # Start pipe to apply transformations to de_markers data frame
+  rownames_to_column("gene") %>%                           # Converts: gene names as row names -> row names into new column "gene"
+  arrange(p_val_adj)                                       # Sorts: most to least statistically significant (top to bottom)
 
-# Save to CSV
-write.csv(de_markers, "results/tables/degs_infected_vs_mock.csv", row.names = FALSE)
+# SAVE TO CSV
+write.csv(de_markers,                                      # Write de_markers data frame to CSV file
+          "results/tables/degs_infected_vs_mock.csv",      # File path and name
+          row.names = FALSE)                               # Tell R not to write extra index column for row numbers (already moved gene names to "gene" column
 
-# Basic volcano plot
-pdf("results/figures/volcano_degs.pdf")
+# BASIC VOLCANO PLOT
+pdf("results/figures/volcano_degs.pdf")                    # Volcano plot created after this will be saved here
 ggplot(de_markers, aes(x = avg_log2FC, y = -log10(p_val_adj))) +
   geom_point(alpha = 0.5) +
   geom_hline(yintercept = -log10(0.05), linetype = "dashed", color = "red") +
