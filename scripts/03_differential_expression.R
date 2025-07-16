@@ -1,22 +1,28 @@
-# 03_differential_expression.R
-# Identify DEGs between SARS-CoV-2 and mock DA neurons
+# SARS-CoV-2 scRNA-seq in hPSC-derived DA neurons
+# Step 3: Identify DEGs between SARS-CoV-2 and mock DA neurons
 
-library(Seurat)
-library(ggplot2)
-library(dplyr)
-library(tibble)
+# LIBRARIES
+library(Seurat)                                            # Seurat = for scRNAseq analysis
+library(ggplot2)                                           # ggplot2 = create plots (from tidyverse)
+library(dplyr)                                             # dplyr = manipulate data (from tidyverse)
+library(tibble)                                            # tibble = for tidy data frames (from tidyverse)
 
-# Load clustered object
-seurat <- readRDS("data/processed/combined_clustered.rds")
+# LOAD CLUSTERED SEURAT OBJECT
+seurat <- readRDS("data/processed/combined_clustered.rds") # Load clustered Seurat object saved in script 02
 
-# Recover condition info if missing
-if (is.null(seurat$condition)) {
-  seurat$condition <- ifelse(grepl("^infected_", colnames(seurat)), "SARS-CoV-2", "Mock")
+# RECOVER CONDITION INFO IF MISSING
+if (is.null(seurat$condition)) {                           # Check if condition column exists in Seurat object's metadata
+                                                           # If TRUE, column didn't transfer over from previous step
+  seurat$condition <- ifelse(                              # Reconstruct condition from cell names (barcodes)
+    grepl("^infected_",                                    # Check which barcodes start with "infected" -> assume COVID-infected samples
+          colnames(seurat)), 
+    "SARS-CoV-2",                                          # Label cells with "SARS-CoV-2" if infected
+    "Mock")                                                # If that cell doesn't have "infected" prefix in barcode, labeled as "Mock"
 }
 
-# Set identity
-Idents(seurat) <- seurat$condition
-seurat <- JoinLayers(seurat)
+# SET IDENTITY
+Idents(seurat) <- seurat$condition                         # Treat each cell's condition (infected or mock) as main grouping
+seurat <- JoinLayers(seurat)                               # Ensure Seurat object runs on full dataset (2 merged 10x datasets, infected and mock)
 
 # Run differential expression
 de_markers <- FindMarkers(seurat, ident.1 = "SARS-CoV-2", ident.2 = "Mock", 
