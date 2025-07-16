@@ -1,52 +1,62 @@
-# 04_enrichment_analysis.R
-# GO and KEGG enrichment on DEGs (SARS-CoV-2 vs. Mock)
-# Load required libraries
-library(tidyverse)
-library(clusterProfiler)
-library(org.Hs.eg.db)
+# SARS-CoV-2 scRNA-seq in hPSC-derived DA neurons
+# Step 4: GO and KEGG enrichment on DEGs (SARS-CoV-2 vs. Mock)
 
-# Load DEGs table
-degs <- read_csv("results/tables/degs_infected_vs_mock.csv")
+# LIBRARIES
+library(tidyverse)                                            # tidyverse = for data wrangling (dplyr), reading/writing files, data frames, exc.       
+library(clusterProfiler)                                      # clusterProfiler = for GO and KEGG enrichment 
+library(org.Hs.eg.db)                                         # org.Hs.eg.db = load human gene annotation database for clusterProfiler to map gene IDs
 
-# Filter for significantly differentially expressed genes
-sig_genes <- degs %>%
-  filter(p_val_adj < 0.05, abs(avg_log2FC) > 0.25) %>%
-  pull(gene)
+# LOAD DEGS TABLE
+degs <- read_csv("results/tables/degs_infected_vs_mock.csv")  # Load DEGs table saved in script 03
 
-# Convert gene symbols to Entrez IDs
-genes <- bitr(sig_genes,
-              fromType = "SYMBOL",
-              toType = "ENTREZID",
-              OrgDb = org.Hs.eg.db)
+# FILTER FOR SIGNIFICANTLY DIFFERENTIALLY EXPRESSED GENES 
+sig_genes <- degs %>%                                         # Start tidyverse pipeline with degs data frame
+  filter(                                                     # Keep only genes with...
+         p_val_adj < 0.05,                                    # 1) adjusted p-value < 0.05 (statistically significant)     
+         abs(avg_log2FC) > 0.25) %>%                          # 2) absolute log2 fold change > 0.25 (biologically meaningful change)
+  pull(gene)                                                  # Extracts just gene column as character vector -> gives list of gene symbols for enrichment
 
-# Filter out unmapped genes
-genes <- genes[!is.na(genes$ENTREZID), ]
+# CONVERT GENE SYMBOLS TO ENTREZ IDS 
+genes <- bitr(                                                # Convert list of gene symbols to Entrez IDs with bitr() function
+              sig_genes,                                      # Vector of gene symbols
+              fromType = "SYMBOL",                            # Starting with this ID type 
+              toType = "ENTREZID",                            # Convert to this ID type (needed for enrichment)
+              OrgDb = org.Hs.eg.db)                           # Human annotation database to look up Entrez IDs
+                                                              # Result: data frame with two columns, symbol and entrezid
+# FILTER OUT UNMAPPED GENES
+genes <- genes[!is.na(genes$ENTREZID), ]                      # Remove genes that didn't map to an Entrez ID
+                                                              # genes$ENTREZID = mapped Entrez IDs
+                                                              # is.na(genes$ENTREZID) = return TRUE if Entrez ID missing
+                                                              # ! = invert to keep only mapped genes 
+                                                              # genes[... , ] = subset data frame to keep only rows with valid Entrez IDs
 
-# GO enrichment analysis (Biological Process)
-go_bp <- enrichGO(gene         = genes$ENTREZID,
-                  OrgDb        = org.Hs.eg.db,
-                  keyType      = "ENTREZID",
-                  ont          = "BP",
-                  pAdjustMethod = "BH",
-                  qvalueCutoff = 0.05,
-                  readable     = TRUE)
+# GO ENRICHMENT ANALYSIS FOR BIOLOLGICAL PROCESS
+go_bp <- enrichGO(gene         = genes$ENTREZID,              # Vector of Entrez IDs to test for enrichment (just filtered these)         
+                  OrgDb        = org.Hs.eg.db,                # Use human annotation database for GO term mapping
+                  keyType      = "ENTREZID",                  # Tell function gene IDs are in Entrez format
+                  ont          = "BP",                        # Specify ontology: BP = biological process
+                                                              # Note: could do other options like MF = molecular function, CG = cellular component
+                  pAdjustMethod = "BH",                       # Adjusts p-values for multiple testing using Benjamin-Hochberg FDR
+                                                              # Note: controls false discovery rate (FDR) by reducing risk of false positives
+                  qvalueCutoff = 0.05,                        # Filter out GO terms with adjusted p-values > 0.05, retain only enriched GO terms with FDR < 0.05
+                  readable     = TRUE)                        # Convert Entrez IDs back into gene symbols in outputted result
 
-# KEGG pathway enrichment (optional)
-kegg <- enrichKEGG(gene         = genes$ENTREZID,
-                   organism     = "hsa",
-                   pAdjustMethod = "BH",
-                   qvalueCutoff = 0.05)
+# KEGG PATHWAY ENRICHMENT FOR BIOLOGICAL PATHWAYS
+kegg <- enrichKEGG(gene         = genes$ENTREZID,             # Vector of Entrez IDs to test for enrichment
+                   organism     = "hsa",                      # Specify organism: hsa = homo sapiens
+                   pAdjustMethod = "BH",                      # Adjusts p-values for multiple testing using Benjamin-Hochberg FDR
+                   qvalueCutoff = 0.05)                       # Filter to include pathways with adjusted p-values (FDR) < 0.05
 
-# Save results
-write_csv(as_tibble(go_bp), "results/tables/go_enrichment.csv")
-write_csv(as_tibble(kegg), "results/tables/kegg_enrichment.csv")
+# SAVE RESULTS
+write_csv(as_tibble(go_bp), "results/tables/go_enrichment.csv")  # Save enriched biological process terms in DEGs to csv 
+write_csv(as_tibble(kegg), "results/tables/kegg_enrichment.csv") # Save enriched biological pathways in DEGs to csv
 
-# Print top results
-print(head(go_bp, 10))
-print(head(kegg, 10))
+# PRINT TOP RESULTS
+print(head(go_bp, 10))                                        # Print first 10 rows of GO enrichment results (top BP terms) 
+print(head(kegg, 10))                                         # Print first 10 rows of KEGG pathway results (top pathways) 
 
-# Save enrichment results for downstream plotting
-saveRDS(go_bp, file = "results/tables/go_bp.rds")
-saveRDS(kegg, file = "results/tables/kegg.rds")
+# SAVE ENRICHMENT RESULTS TO PLOT LATER 
+saveRDS(go_bp, file = "results/tables/go_bp.rds")             # Save GO enrichment results to .rds file
+saveRDS(kegg, file = "results/tables/kegg.rds")               # Save KEGG enrichment results to .rds file
 
-cat("Enrichment analysis complete. Results saved to results/tables/\n")
+cat("Enrichment analysis complete. Results saved to results/tables/\n") # Update the user
