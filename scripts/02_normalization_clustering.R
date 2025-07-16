@@ -1,4 +1,4 @@
-# SARS-CoV-2 scRNA-seq in hPSC-derived DA neurons (GSE248989)
+# SARS-CoV-2 scRNA-seq in hPSC-derived DA neurons
 # Step 2: Normalize, scale, reduce dimensions, and cluster COVID vs mock cells
 
 # LIBRARIES
