@@ -1,47 +1,58 @@
-# scripts/05_enrichment_dotplots.R
+# SARS-CoV-2 scRNA-seq in hPSC-derived DA neurons
+# Step 5: Plot dotplots from GO and KEGG Enrichment
 
-library(clusterProfiler)
-library(ggplot2)
-library(ggnewscale)
-library(dplyr)
-library(tibble)
-library(readr)
-library(org.Hs.eg.db)
+# LIBRARIES
+library(clusterProfiler)                                      # clusterProfiler = for GO and KEGG enrichment 
+library(ggplot2)                                              # ggplot2 = for dotplot customization of dotplots created with clusterProfiler
+library(ggnewscale)                                           # ggnewscale = for multiple colors in ggplot2 plots
+library(dplyr)                                                # dplyr = manipulate data (from tidyverse)
+library(tibble)                                               # tibble = for tidy data frames (from tidyverse)
+library(readr)                                                # readr = for fast file input/output 
+library(org.Hs.eg.db)                                         # org.Hs.eg.db = load human gene annotation database for clusterProfiler to map gene IDs and run enrichment analyses
 
-# Create results/figures directory if it doesn't exist
-if (!dir.exists("results/figures")) {
-  dir.create("results/figures", recursive = TRUE)
+# CREATE RESULTS/FIGURES DIRECTORY 
+if (!dir.exists("results/figures")) {                         # Check whether results/figures directory exists
+  dir.create("results/figures", recursive = TRUE)             # If directory doesn't exist, create it 
 }
 
-# Load DEGs table
-degs <- read_csv("results/tables/degs_infected_vs_mock.csv")
+# LOADS DEGS TABLE 
+degs <- read_csv("results/tables/degs_infected_vs_mock.csv")  # Read CSV file into tibble "degs"
 
-# Filter for significant genes
-sig_genes <- degs$gene[degs$p_val_adj < 0.05]
+# FILTER FOR SIGNIFICANT GENES
+sig_genes <- degs$gene[degs$p_val_adj < 0.05]                 # Filters DEGs for significant ones only, pulling their gene symbols
+                                                              # degs$p_val_adj < 0.05 = identifies rows where adjusted p-values < 0.05 (statistically signifcant)
+                                                              # degs$gene[...] = extracts gene column of identified statistically significant genes 
+                                                              # sig_genes = vector of gene symbols for enrichment
+# CONVERT GENE SYMBOLS TO ENTREZ IDS 
+genes <- bitr(                                                # Convert list of gene symbols to Entrez IDs with bitr() function
+              sig_genes,                                      # Vector of gene symbols
+              fromType = "SYMBOL",                            # Starting with this ID type 
+              toType = "ENTREZID",                            # Convert to this ID type (needed for enrichment)
+              OrgDb = org.Hs.eg.db)                           # Human annotation database to look up Entrez IDs
+                                                              # Result: data frame with two columns, symbol and entrezid
+# FILTER OUT UNMAPPED GENES
+genes <- genes[!is.na(genes$ENTREZID), ]                      # Remove genes that didn't map to an Entrez ID
+                                                              # genes$ENTREZID = mapped Entrez IDs
+                                                              # is.na(genes$ENTREZID) = return TRUE if Entrez ID missing
+                                                              # ! = invert to keep only mapped genes 
+                                                              # genes[... , ] = subset data frame to keep only rows with valid Entrez IDs
 
-# Map to Entrez IDs
-genes <- bitr(sig_genes,
-              fromType = "SYMBOL",
-              toType = "ENTREZID",
-              OrgDb = org.Hs.eg.db)
-genes <- genes[!is.na(genes$ENTREZID), ]
+# GO ENRICHMENT ANALYSIS FOR BIOLOLGICAL PROCESS
+go_bp <- enrichGO(gene = genes$ENTREZID,                      # Vector of Entrez IDs to test for enrichment (just filtered these)  
+                  OrgDb = org.Hs.eg.db,                       # Use human annotation database for GO term mapping
+                  ont = "BP",                                 # Specify ontology: BP = biological process
+                  pAdjustMethod = "BH",                       # Adjusts p-values for multiple testing using Benjamin-Hochberg FDR
+                  pvalueCutoff = 0.05,                        # Filter out GO terms with raw p-values > 0.05
+                  readable = TRUE)                            # Convert Entrez IDs back into gene symbols in outputted result
 
-# Run GO BP enrichment
-go_bp <- enrichGO(gene = genes$ENTREZID,
-                  OrgDb = org.Hs.eg.db,
-                  ont = "BP",
-                  pAdjustMethod = "BH",
-                  pvalueCutoff = 0.05,
-                  readable = TRUE)
+# KEGG PATHWAY ENRICHMENT FOR BIOLOGICAL PATHWAYS
+kegg <- enrichKEGG(gene = genes$ENTREZID,                     # Vector of Entrez IDs to test for enrichment
+                   organism = "hsa",                          # Specify organism: hsa = homo sapiens
+                   pvalueCutoff = 0.05)                       # Filter to include pathways with raw p-values < 0.05
 
-# Run KEGG enrichment
-kegg <- enrichKEGG(gene = genes$ENTREZID,
-                   organism = "hsa",
-                   pvalueCutoff = 0.05)
-
-# Save results
-saveRDS(go_bp, file = "results/tables/go_bp.rds")
-saveRDS(kegg,  file = "results/tables/kegg.rds")
+# SAVE ENRICHMENT RESULTS TO PLOT LATER 
+saveRDS(go_bp, file = "results/tables/go_bp.rds")             # Save GO enrichment results to .rds file
+saveRDS(kegg,  file = "results/tables/kegg.rds")              # Save KEGG enrichment results to .rds file
 
 # Plot GO Biological Processes
 p1 <- dotplot(go_bp, showCategory = 15, title = "GO Biological Process Enrichment") +
