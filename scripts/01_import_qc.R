@@ -57,19 +57,34 @@ combined <- merge(                                         # Merge two Seurat ob
                   add.cell.ids = names(seurat_list),       # Add prefix to cell barcode (indicates original sample) so barcodes are unique
                   project = "SARS-CoV-2_DA")               # Set project name for new combined object
 
-# ---- Calculate mitochondrial gene percentage ----
-combined[["percent.mt"]] <- PercentageFeatureSet(combined, pattern = "^MT-")
+# CALCULATE MITOCHONDRIAL GENE PERCENTAGE
+combined[["percent.mt"]] <-                                # Store percentage in Seurat object's metadata under percent.mt
+PercentageFeatureSet(combined, pattern = "^MT-")           # Calculate proportion of transcripts (UMI counts) from (mitochondrial) genes starting with MT-
+                                                           # Note: mitochondrial genes = highly expressed when cell is under high stress
+# VISUALIZE QC METRICS  
+VlnPlot(combined,                                          # Create violin plots for metadata features in Seurat object 
+                                                           # Note: violin plots show distribution of values across all cells for a feature
+        features = c(                                      # Plot the following (QC metrics)...
+  "nFeature_RNA",                                          # 1) Number of genes (features) detected per cell
+  "nCount_RNA",                                            # 2) Total number of UMI counts per cell
+  "percent.mt"),                                           # 3) Percent of reads mapping to mitochondrial genes
+        ncol = 3)                                          # Arrangement: 1 row, 3 columns
+                                                           # Result: 3 violin plots
+                                                           # 1) nFeature_RNA: filters out low-complexity cells or doublets (when high)
+                                                           # 2) nCount_RNA: detects outliers (when high)
+                                                           # 3) percent.mt: flags stressed or lysed cells (when high)
+                                                           # Note: Low everything = empty droplets
 
-# ---- Visualize QC metrics ----
-VlnPlot(combined, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+# FILTER CELLS
+combined <- subset(combined,                               # subset() returns new Seurat object with filtered cells only
+                                                           # Cells must meet these criteria to stay:
+                   subset = nFeature_RNA > 300 &           # 1) Cells express fewer than 300 genes? Out. Likely empty droplets or dead cells
+                            nFeature_RNA < 5000 &          # 2) Cells express more than 5000 genes? Out. Likely doublets containing multiple cells in one droplet
+                            percent.mt < 10)               # 3) More than 10% mitochondrial content? Out. Likely stressed/lysed/dying cells
+                                                           # Now just filtered, cleaned cells remain
+# SAVE PREPROCESSED DATA
+saveRDS(combined, file = "data/processed/combined_qc.rds") # Save filtered Seurat object in RDS format (avoid preprocessing in later steps) in processed folder
+                                                           # RDS file will include: count matrix, metadata, QC metrics (percent.mt, sample_id, condition)
+                                                           # Load in future: combined <- readRDS("data/processed/combined_qc.rds")
 
-# ---- Filter cells ----
-combined <- subset(combined,
-                   subset = nFeature_RNA > 300 & 
-                            nFeature_RNA < 5000 & 
-                            percent.mt < 10)
-
-# ---- Save output ----
-saveRDS(combined, file = "data/processed/combined_qc.rds")
-
-cat("Import and QC complete. Output saved to data/processed/combined_qc.rds\n")
+cat("Import and QC complete. Output saved to data/processed/combined_qc.rds\n") # Update the user
