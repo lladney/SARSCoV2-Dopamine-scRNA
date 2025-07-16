@@ -43,14 +43,26 @@ write.csv(de_markers,                                      # Write de_markers da
 
 # BASIC VOLCANO PLOT
 pdf("results/figures/volcano_degs.pdf")                    # Volcano plot created after this will be saved here
-ggplot(de_markers, aes(x = avg_log2FC, y = -log10(p_val_adj))) +
-  geom_point(alpha = 0.5) +
-  geom_hline(yintercept = -log10(0.05), linetype = "dashed", color = "red") +
-  geom_vline(xintercept = c(-1, 1), linetype = "dashed", color = "blue") +
-  theme_minimal() +
-  labs(title = "DEGs: SARS-CoV-2 vs. Mock",
-       x = "Log2 Fold Change",
-       y = "-Log10 Adjusted P-Value")
-dev.off()
+ggplot(de_markers,                                         # Initialize volcano plot with de_markers data frame
+       aes(x = avg_log2FC,                                 # Map to x-axis: log2 fold change between infected and mock
+                                                           # Note: genes on... right = upregulated, left = downregulated
+           y = -log10(p_val_adj))) +                       # Map to y-axis: inverse log scale of adjusted p-value
+                                                           # Note: the higher the gene, the more significant
+           geom_point(alpha = 0.5) +                       # Add transparent point for each gene (based on log fold change and p-value)
+                                          
+           geom_hline(yintercept = -log10(0.05),           # Draw red horizontal dashed line at -log10(0.05) to mark the adjusted p-value significance threshold
+                      linetype = "dashed",                 # Note: genes above line? signficant; below? not significant
+                      color = "red") +
+           geom_vline(xintercept = c(-1, 1),               # Draw two vertical blue dashed lines at -1 and 1 to mark 2-fold change in either direction
+                      linetype = "dashed",                 # Note: highlights genes of strong biological effect sizes
+                      color = "blue") +
+           theme_minimal() +                               # Apply clean background
+           
+          labs(                                            # Add labels
+           title = "DEGs: SARS-CoV-2 vs. Mock",           
+           x = "Log2 Fold Change",                        
+           y = "-Log10 Adjusted P-Value")
 
-cat("DE analysis complete. Output saved to results/tables/degs_infected_vs_mock.csv\n")
+dev.off()                                                  # Close the PDF with volcano plot
+
+cat("DE analysis complete. Output saved to results/tables/degs_infected_vs_mock.csv\n") # Update the user
