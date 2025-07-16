@@ -25,12 +25,14 @@ seurat_list <- map2(                                       # Use purrr package (
   .f = function(path, sample_id) {                         # Function reads over gene expression matrix from each path, creates Seurat object,...
                                                            # ...annotates it with sample ID and condition from metadata, and returns Seurat object
                                                            # Executes twice (once for infected, then mock)
+    
     counts <- Read10X(data.dir = path)                     # Read in gene expression count data from 10x Genomics Cell Ranger pipeline
                                                            # Looks for: 
                                                            # 1) matrix.mtx.gz (gene-by-cell sparse matrix)
                                                            # 2) features.tsv.gz (list of features: genes, IDs)
                                                            # 3) barcodes.tsv.gz (cell barcode identifiers)
                                                            # Returns: sparse matrix R object with rows (genes), columns (cells), entries = UMI counts
+   
     obj <- CreateSeuratObject(                             # Raw gene expression matrix -> Seurat object for scRNAseq analysis
                               counts = counts,             # Gene (row) by cell (column) sparse dgCMatrix with UMI couts in each cell, read from Read10x()
                               project = sample_id,         # Assign project name to Seurat object (sample_id = infected or mock)
@@ -38,6 +40,7 @@ seurat_list <- map2(                                       # Use purrr package (
                               min.features = 200)          # Filter out cells detected with <200 genes (standard to filter out low-quality cells... 
                                                            # ...i.e., empty droplets, dead cells, lysed cells) 
                                                            # Could adjust down since working with neurons which have lower RNA content
+    
     obj$sample_id <- sample_id                             # Add new column sample_id (infected or mock) to metadata of Seurat object
     obj$condition <- sample_metadata %>%                   # Add new column condition to metadata of Seurat object
     filter(sample_id == !!sample_id) %>%                   # Keep only rows where sample_id matches current sample ID being processed
