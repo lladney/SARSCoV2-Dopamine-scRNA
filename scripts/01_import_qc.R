@@ -38,14 +38,24 @@ seurat_list <- map2(                                       # Use purrr package (
                               min.features = 200)          # Filter out cells detected with <200 genes (standard to filter out low-quality cells... 
                                                            # ...i.e., empty droplets, dead cells, lysed cells) 
                                                            # Could adjust down since working with neurons which have lower RNA content
-    obj$sample_id <- sample_id
-    obj$condition <- sample_metadata %>% filter(sample_id == !!sample_id) %>% pull(condition)
-    return(obj)
+    obj$sample_id <- sample_id                             # Add new column sample_id (infected or mock) to metadata of Seurat object
+    obj$condition <- sample_metadata %>%                   # Add new column condition to metadata of Seurat object
+    filter(sample_id == !!sample_id) %>%                   # Keep only rows where sample_id matches current sample ID being processed
+    pull(condition)                                        # Use pull() from dplyr (tidyverse) to extract condition from matched row into vector
+    return(obj)                                            # Return Seurat object defined in map2()
+                                                           # obj contains: 
+                                                           # 1) UMI count matrix (genes x cells)
+                                                           # 2) Initial QC metrics (nFeature_RNA, nCount_RNA)
+                                                           # 3) Two metadata fields: a) sample_id: mock or infected, and b) condition: control or infected
   }
 )
 
-# ---- Merge datasets ----
-combined <- merge(seurat_list$infected, y = seurat_list$mock, add.cell.ids = names(seurat_list), project = "SARS-CoV-2_DA")
+# MERGE DATASETS
+combined <- merge(                                         # Merge two Seurat objects (infected, mock) into combined object (combined)
+                  seurat_list$infected,                    # First Seurat object in merge
+                  y = seurat_list$mock,                    # Second Seurat object to merge into the first
+                  add.cell.ids = names(seurat_list),       # Add prefix to cell barcode (indicates original sample) so barcodes are unique
+                  project = "SARS-CoV-2_DA")               # Set project name for new combined object
 
 # ---- Calculate mitochondrial gene percentage ----
 combined[["percent.mt"]] <- PercentageFeatureSet(combined, pattern = "^MT-")
