@@ -54,19 +54,24 @@ kegg <- enrichKEGG(gene = genes$ENTREZID,                     # Vector of Entrez
 saveRDS(go_bp, file = "results/tables/go_bp.rds")             # Save GO enrichment results to .rds file
 saveRDS(kegg,  file = "results/tables/kegg.rds")              # Save KEGG enrichment results to .rds file
 
-# Plot GO Biological Processes
-p1 <- dotplot(go_bp, showCategory = 15, title = "GO Biological Process Enrichment") +
-  theme_minimal(base_size = 14) +
-  theme(axis.text.y = element_text(size = 10))
-ggsave("results/figures/dotplot_go_bp.png", p1, width = 10, height = 6)
+# DOTPLOT OF GO BIOLOGICAL PROCESSES
+p1 <- dotplot(go_bp, showCategory = 15,                       # Plot top 15 enriched GO terms from go_bp object
+              title = "GO Biological Process Enrichment") +   # Dotplot title
+  theme_minimal(base_size = 14) +                             # Apply ggplot2 theme with font size 14
+  theme(axis.text.y = element_text(size = 10))                # Increase GO term name font size on y-axis
 
-# Plot KEGG Pathways (only if enrichment returned results)
-if (!is.null(kegg) && inherits(kegg, "enrichResult") && nrow(as.data.frame(kegg)) > 0) {
-  p2 <- dotplot(kegg, showCategory = 15, title = "KEGG Pathway Enrichment") +
-    theme_minimal(base_size = 14) +
-    theme(axis.text.y = element_text(size = 10))
-  ggsave("results/figures/dotplot_kegg.png", p2, width = 10, height = 6)
-} else {
-  message("No KEGG pathways passed the significance threshold.")
+ggsave("results/figures/dotplot_go_bp.png", p1, width = 10, height = 6) # Save dotplot as PNG (10 inches wide x 6 inches tall)
+
+# PLOT KEGG PATHWAYS (IF ENRICHMENT RETURNS RESULTS) 
+if (!is.null(kegg) &&                                         # Check if kegg object exists (there are enriched pathways)
+    inherits(kegg, "enrichResult") &&                         # Confirms correct object class for plotting
+    nrow(as.data.frame(kegg)) > 0) {                          # Confirm at least one enriched pathway
+  p2 <- dotplot(kegg, showCategory = 15,                      # Plot top 15 KEGG Pathways from kegg object
+                title = "KEGG Pathway Enrichment") +          # Dotplot title
+    theme_minimal(base_size = 14) +                           # Apply ggplot2 theme with font size 14
+    theme(axis.text.y = element_text(size = 10))              # Increase KEGG Pathway name font size on y-axis
+  
+  ggsave("results/figures/dotplot_kegg.png", p2, width = 10, height = 6) # Save dotplot as PNG (10 inches wide x 6 inches tall)
+} else {                                                      # If there are no enriched pathways...
+  message("No KEGG pathways passed the significance threshold.") # Warning message to user to signify no plot generation
 }
-
