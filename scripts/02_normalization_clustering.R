@@ -16,14 +16,20 @@ seurat <- FindVariableFeatures(seurat,                     # Identifies most var
                                                            # Note: preferred for high-throughput scRNAseq data 
                                nfeatures = 2000)           # Select top 2,000 most variable genes
                                                            # Note: likely show biological variation, not just noise
+                                                           # Variable genes stored in: VariableFeatures(seurat)
+# SCALE AND RUN PCA
+seurat <- ScaleData(seurat)                                # Does 2 things:
+                                                           # 1) Centers expression values (subtract mean expression across all cells, so that nean is zero)
+                                                           # 2) Scales expression values (divide by standard deviation, so that SD is one)
 
-# Scale and run PCA
-seurat <- ScaleData(seurat)
-seurat <- RunPCA(seurat, features = VariableFeatures(seurat))
-
-# Visualize PCA elbow plot
-pdf("results/figures/pca_elbow_plot.pdf")
-ElbowPlot(seurat)
+seurat <- RunPCA(seurat,                                   # Perform Principal Component Analysis (PCA): reduces dimension while preserving variation
+                 features = VariableFeatures(seurat))      # Use only those top 2,000 most variable genes identified earlier for PCA (to reduce noise)
+                                                           # Note: High-dimensional gene expression data (genes x cells) -> reduced to... principal components (PCs)
+                                                           # Note: PC = linear combo of genes (helps explain variance in data), with PC1 being most variant and so on
+# VISUALIZE PCA ELBOW PLOT
+pdf("results/figures/pca_elbow_plot.pdf")                  # Plots created after this will be saved here
+ElbowPlot(seurat)                                          # Generate elbow plot from PCA results (helps determine how many PCs to keep for later steps)
+          
 dev.off()
 
 # Run UMAP and clustering
