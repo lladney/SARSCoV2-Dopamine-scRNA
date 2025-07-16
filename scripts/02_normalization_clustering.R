@@ -1,15 +1,21 @@
-# 02_normalization_clustering.R
-# Normalize, scale, reduce dimensions, and cluster SARS-CoV-2 vs. mock cells
+# SARS-CoV-2 scRNA-seq in hPSC-derived DA neurons (GSE248989)
+# Step 2: Normalize, scale, reduce dimensions, and cluster COVID vs mock cells
 
-library(Seurat)
-library(ggplot2)
+# LIBRARIES
+library(Seurat)                                            # Seurat = for scRNAseq analysis
+library(ggplot2)                                           # ggplot2 = create plots (from tidyverse)
 
-# Load QC'd object
-seurat <- readRDS("data/processed/combined_qc.rds")
+# LOAD PREPROCESSED SEURAT OBJECT
+seurat <- readRDS("data/processed/combined_qc.rds")        # Load filtered Seurat object saved in script 01
 
-# Normalize and identify variable features
-seurat <- NormalizeData(seurat)
-seurat <- FindVariableFeatures(seurat, selection.method = "vst", nfeatures = 2000)
+# NORMALIZE AND IDENTIFY VARIABLE FEATURES
+seurat <- NormalizeData(seurat)                            # Normalize gene expression for each cell
+                                                           # Note: Important because cells have high range of UMI counts so normalization makes cell comparable
+seurat <- FindVariableFeatures(seurat,                     # Identifies most variable genes across all cells
+                               selection.method = "vst",   # vst = Variance Stabilizing Transformation, which models gene expression mean/variance 
+                                                           # Note: preferred for high-throughput scRNAseq data 
+                               nfeatures = 2000)           # Select top 2,000 most variable genes
+                                                           # Note: likely show biological variation, not just noise
 
 # Scale and run PCA
 seurat <- ScaleData(seurat)
