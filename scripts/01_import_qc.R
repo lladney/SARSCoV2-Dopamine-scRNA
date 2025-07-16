@@ -1,4 +1,4 @@
-# SARS-CoV-2 scRNA-seq in hPSC-derived DA neurons (GSE248989)
+# SARS-CoV-2 scRNA-seq in hPSC-derived DA neurons
 # Step 1: Import, QC, merge Seurat objects
 
 # LIBRARIES
