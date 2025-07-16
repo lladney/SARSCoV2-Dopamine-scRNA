@@ -38,7 +38,7 @@ go_bp <- enrichGO(gene         = genes$ENTREZID,              # Vector of Entrez
                                                               # Note: could do other options like MF = molecular function, CG = cellular component
                   pAdjustMethod = "BH",                       # Adjusts p-values for multiple testing using Benjamin-Hochberg FDR
                                                               # Note: controls false discovery rate (FDR) by reducing risk of false positives
-                  qvalueCutoff = 0.05,                        # Filter out GO terms with adjusted p-values > 0.05, retain only enriched GO terms with FDR < 0.05
+                  qvalueCutoff = 0.05,                        # Filter out GO terms with adjusted p-values (q-values) > 0.05, retain only enriched GO terms with FDR < 0.05
                   readable     = TRUE)                        # Convert Entrez IDs back into gene symbols in outputted result
 
 # KEGG PATHWAY ENRICHMENT FOR BIOLOGICAL PATHWAYS
