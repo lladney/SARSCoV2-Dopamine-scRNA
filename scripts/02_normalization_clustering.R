@@ -11,9 +11,11 @@ seurat <- readRDS("data/processed/combined_qc.rds")        # Load filtered Seura
 # NORMALIZE AND IDENTIFY VARIABLE FEATURES
 seurat <- NormalizeData(seurat)                            # Normalize gene expression for each cell
                                                            # Note: Important because cells have high range of UMI counts so normalization makes cell comparable
+
 seurat <- FindVariableFeatures(seurat,                     # Identifies most variable genes across all cells
                                selection.method = "vst",   # vst = Variance Stabilizing Transformation, which models gene expression mean/variance 
                                                            # Note: preferred for high-throughput scRNAseq data 
+ 
                                nfeatures = 2000)           # Select top 2,000 most variable genes
                                                            # Note: likely show biological variation, not just noise
                                                            # Variable genes stored in: VariableFeatures(seurat)
@@ -27,23 +29,31 @@ seurat <- RunPCA(seurat,                                   # Perform Principal C
                                                            # Note: High-dimensional gene expression data (genes x cells) -> reduced to... principal components (PCs)
                                                            # Note: PC = linear combo of genes (helps explain variance in data), with PC1 being most variant and so on
 # VISUALIZE PCA ELBOW PLOT
-pdf("results/figures/pca_elbow_plot.pdf")                  # Plots created after this will be saved here
+pdf("results/figures/pca_elbow_plot.pdf")                  # Elbow plot created after this will be saved here
 ElbowPlot(seurat)                                          # Generate elbow plot from PCA results (helps determine how many PCs to keep for later steps)
-          
-dev.off()
+                                                           # Note: PC index (x) by SD (y) to show how much variance explained by each PC
+                                                           # Elbow = flat point in curve; before elbow = meaningful variant PCs; after elbow = PCs just noise
 
-# Run UMAP and clustering
-seurat <- FindNeighbors(seurat, dims = 1:15)
-seurat <- FindClusters(seurat, resolution = 0.5)
-seurat <- RunUMAP(seurat, dims = 1:15)
+dev.off()                                                  # Close the PDF with PCA elbow plot
 
-# Save UMAP plot
-pdf("results/figures/umap_clusters.pdf")
-DimPlot(seurat, reduction = "umap", group.by = "seurat_clusters", label = TRUE) +
-  ggtitle("UMAP Clustering of DA Neurons")
-dev.off()
+# RUN UMAP AND CLUSTERING
+seurat <- FindNeighbors(seurat, dims = 1:15)               # Use PCs 1-15 (elbow touchdown around 15)
+                                                           # Make similarity graph linking cells to their PC neighbors
+seurat <- FindClusters(seurat, resolution = 0.5)           # Use similarity fraph from FindNeighbors() to detect clusters; 0.5 = medium resolution
+seurat <- RunUMAP(seurat, dims = 1:15)                     # Run Uniform Manifold Approximation and Projection (UMAP) to project the cells into 2D space
+                                                           # Note: each point = cell; distance between points = similarity in expression (based on PCA)
 
-# Save Seurat object
-saveRDS(seurat, file = "data/processed/combined_clustered.rds")
+# SAVE UMAP PLOT
+pdf("results/figures/umap_clusters.pdf")                   # UMAP cluster plot created after this will be saved here
+DimPlot(seurat,                                            # Seurat function to plot dimension reductions, one of which is UMAP
+        reduction = "umap",                                # Specify UMAP coordinates
+        group.by = "seurat_clusters",                      # Color code cells based on cluster assignment
+        label = TRUE) +                                    # Add labels to each cluster
+  ggtitle("UMAP Clustering of DA Neurons")                 # Add title to the UMAP cluster plot
 
-cat("Normalization, PCA, UMAP, and clustering complete. Output saved to data/processed/combined_clustered.rds\n")
+dev.off()                                                  # Close the PDF with UMAP cluster plot
+
+# SAVE SEURAT OBJECT
+saveRDS(seurat, file = "data/processed/combined_clustered.rds") # Save clustered Seurat object in RDS format (avoid repeating clustering in later steps) in processed folder
+
+cat("Normalization, PCA, UMAP, and clustering complete. Output saved to data/processed/combined_clustered.rds\n") # Update the user
